@@ -17,7 +17,7 @@ public class DMat implements Matrix {
     }
 
     @Override
-    public Matrix mul(Matrix b) throws IOException {
+    public Matrix mul(Matrix b) throws IOException, InterruptedException {
         DMat resD;
         DMat a = this;
         resD = a.mulDD((DMat) b);
@@ -77,16 +77,15 @@ public class DMat implements Matrix {
     private DMat pmulDD(DMat m2) throws InterruptedException, IOException {
         DMat m1 = this;
         DMat res = new DMat(null);
-        m2=m2.transpose(m2);
-        res.arr=new double[m1.arr.length][m1.arr.length];
+        m2 = m2.transpose(m2);
+        res.arr = new double[m1.arr.length][m1.arr.length];
         Dispatch d = new Dispatch();
         DMat finalM = m2;
         class MyCode implements Runnable {
             public void run() {
-                int i = -1;
-                while (i != m1.arr.length) {
-                    i = d.next();
-                    //System.out.println("i=" + i);
+                for (int i = d.next(); i < m1.arr.length; i = d.next()) {
+
+
                     for (int j = 0; j < finalM.arr.length; j++) {
                         for (int k = 0; k < finalM.arr.length; k++) {
                             res.arr[i][j] = res.arr[i][j] + m1.arr[i][k] * finalM.arr[j][k];
